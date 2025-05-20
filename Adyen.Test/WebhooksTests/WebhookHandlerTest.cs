@@ -155,10 +155,10 @@ namespace Adyen.Test.WebhooksTests
             var serializer = new SaleToPoiMessageSerializer();
             var saleToPoiRequest = serializer.DeserializeNotification(notification);
             var eventNotification = (EventNotification)saleToPoiRequest.MessagePayload;
-            Assert.AreEqual(saleToPoiRequest.MessageHeader.SaleID, saleID);
-            Assert.AreEqual(eventNotification.EventDetails, eventDetails);
-            Assert.AreEqual(eventNotification.EventToNotify, expectedEventType);
-            Assert.AreEqual(eventNotification.TimeStamp, new DateTime(2019, 8, 7, 10, 16, 10));
+            Assert.AreEqual(saleID, saleToPoiRequest.MessageHeader.SaleID);
+            Assert.AreEqual(eventDetails, eventNotification.EventDetails);
+            Assert.AreEqual(expectedEventType, eventNotification.EventToNotify);
+            Assert.AreEqual(new DateTime(2019, 8, 7, 10, 16, 10), eventNotification.TimeStamp);
         }
         
         [TestMethod]
