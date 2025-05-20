@@ -128,30 +128,36 @@ namespace Adyen.Test.WebhooksTests
         }
 
         [TestMethod]
-        public void TestPOSEventNotification()
+        [DataRow("Shutdown", "newstate=IDLE&oldstate=START", "POSSystemID12345", EventToNotifyType.Shutdown)]
+        [DataRow("NetworkDisconnected", "message=Terminal V400m-324688179 disconnected", "N/A", EventToNotifyType.NetworkDisconnected)]
+        [DataRow("NetworkConnected", "message=Terminal V400m-324688179 connected", "N/A", EventToNotifyType.NetworkConnected)]
+        public void TestPOSEventNotification(string eventToNotify, string eventDetails, string saleID, EventToNotifyType expectedEventType)
         {
-            var notification = @"{
-                'SaleToPOIRequest':{
-                    'EventNotification':{
-                        'EventDetails':'newstate=IDLE&oldstate=START',
-                        'EventToNotify':'Shutdown',
-                        'TimeStamp':'2019-08-07T10:16:10.000Z'
+            var notification = 
+                @"{
+                   'SaleToPOIRequest': {
+                        'EventNotification': {
+                            'EventDetails': '" + eventDetails + @"',
+                            'EventToNotify': '" + eventToNotify + @"',
+                            'TimeStamp': '2019-08-07T10:16:10.000Z'
                         },
-                    'MessageHeader':{
-                        'SaleID':'POSSystemID12345',
-                        'ProtocolVersion':'3.0',
-                        'MessageType':'Notification',
-                        'POIID':'V400m-324688179',
-                        'MessageClass':'Event',
-                        'MessageCategory':'Event',
-                        'DeviceID':'1517998561'
+                        'MessageHeader': {
+                            'SaleID': '" + saleID + @"',
+                            'ProtocolVersion': '3.0',
+                            'MessageType': 'Notification',
+                            'POIID': 'V400m-324688179',
+                            'MessageClass': 'Event',
+                            'MessageCategory': 'Event',
+                            'DeviceID': '1517998561'
                         }
                     }
-            }";
+                }";
             var serializer = new SaleToPoiMessageSerializer();
             var saleToPoiRequest = serializer.DeserializeNotification(notification);
-            var eventNotification = (EventNotification) saleToPoiRequest.MessagePayload;
-            Assert.AreEqual(eventNotification.EventDetails, "newstate=IDLE&oldstate=START");
+            var eventNotification = (EventNotification)saleToPoiRequest.MessagePayload;
+            Assert.AreEqual(saleToPoiRequest.MessageHeader.SaleID, saleID);
+            Assert.AreEqual(eventNotification.EventDetails, eventDetails);
+            Assert.AreEqual(eventNotification.EventToNotify, expectedEventType);
             Assert.AreEqual(eventNotification.TimeStamp, new DateTime(2019, 8, 7, 10, 16, 10));
         }
         

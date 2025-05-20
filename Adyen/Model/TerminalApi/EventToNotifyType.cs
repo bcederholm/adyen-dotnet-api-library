@@ -53,5 +53,11 @@
 
         /// <remarks/>
         Reject,
+        
+        /// <remarks/>
+        NetworkDisconnected,
+        
+        /// <remarks/>
+        NetworkConnected
     }
 }
